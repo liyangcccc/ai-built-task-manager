@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  tasks     Task[]
+  routines  Routine[]
+  settings  UserSettings?
+  
+  @@map("users")
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  completed   Boolean    @default(false)
+  priority    String     @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  dueDate     DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  // Relations
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  @@map("tasks")
+}
+
+model Category {
+  id               String   @id @default(cuid())
+  name             String   @unique
+  color            String   @default("#3B82F6") // Default blue color
+  description      String?  // Optional description
+  icon             String?  // Optional emoji or icon identifier
+  defaultPriority  String   @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  notes            String?  // Optional notes
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations
+  tasks     Task[]
+  routines  Routine[]
+  
+  @@map("categories")
+}
+
+model Routine {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  priority        String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  isActive        Boolean   @default(true)
+  
+  // Schedule configuration
+  recurrenceType  String    // DAILY, WEEKLY, MONTHLY, CUSTOM
+  interval        Int?      // For CUSTOM: every X days
+  daysOfWeek      String?   // For WEEKLY: JSON array ["MON", "WED", "FRI"]
+  dayOfMonth      Int?      // For MONTHLY: 1-31
+  time            String?   // Optional time "09:30"
+  
+  // Date range
+  startDate       DateTime?
+  endDate         DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  @@map("routines")
+}
+
+model UserSettings {
+  id        String   @id @default(cuid())
+  theme     String   @default("system") // light, dark, system
+  language  String   @default("en") // en, zh
+  timezone  String   @default("America/New_York") // IANA timezone identifier
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_settings")
+}

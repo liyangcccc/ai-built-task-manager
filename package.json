@@ -1,0 +1,23 @@
+{
+  "name": "personal-task-manager",
+  "version": "1.0.0",
+  "description": "A full-stack personal task management application",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "dev": "bash scripts/dev.sh",
+    "build": "bash scripts/build.sh",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test"
+  },
+  "keywords": ["task-manager", "react", "node", "express", "sqlite", "prisma"],
+  "author": "",
+  "license": "ISC"
+}
